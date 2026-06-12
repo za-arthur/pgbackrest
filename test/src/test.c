@@ -56,6 +56,9 @@ STRING_EXTERN(TEST_PROJECT_EXE_STR, TEST_PROJECT_EXE);
 // Path where the test is running
 #define TEST_PATH                                                   "{[C_TEST_PATH]}"
 
+// Additional postgresql.conf for integration testing
+#define TEST_CONFIG                                                 "{[C_TEST_CONFIG]}"
+
 #ifdef HRN_FEATURE_STRING
 STRING_DECLARE(TEST_PATH_STR);
 STRING_EXTERN(TEST_PATH_STR, TEST_PATH);
@@ -213,6 +216,7 @@ main(int argListSize, const char *argList[])
         {[C_TEST_TIMING]},          // Is timing enabled (may be disabled for reproducible documentation)
         TEST_ARCHITECTURE,          // Test architecture
         TEST_PATH,                  // Path where tests write data
+        TEST_CONFIG,                // Additional postgresql.conf for integration testing
         TEST_USER,                  // User running the test
         TEST_VM,                    // VM for integration testing
         TEST_PG_VERSION,            // PostgreSQL version for integration testing

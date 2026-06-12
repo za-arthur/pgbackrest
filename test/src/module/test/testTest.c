@@ -99,8 +99,9 @@ testRun(void)
 
         TEST_ERROR(
             cmdTest(
-                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), STRDEF("none"), 3, STRDEF("invalid"),
-                STRDEF("common/stack-trace"), 0, 1, logLevelDebug, true, NULL, NULL, false, false, false, true),
+                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), NULL, STRDEF("none"), 3,
+                STRDEF("invalid"), STRDEF("common/stack-trace"), 0, 1, logLevelDebug, true, NULL, NULL, false, false,
+                false, true),
             FormatError, "6 linter error(s) in 'test.c' (see warnings above)");
 
         TEST_RESULT_LOG(
@@ -160,6 +161,7 @@ testRun(void)
         strReplace(testC, STRDEF("{[C_TEST_GROUP_ID_Z]}"), STRDEF("\"" TEST_GROUP_ID_Z "\""));
         strReplace(testC, STRDEF("{[C_TEST_IDX]}"), STRDEF("3"));
         strReplace(testC, STRDEF("{[C_TEST_PATH]}"), STRDEF(TEST_PATH "/test/test-3"));
+        strReplace(testC, STRDEF("{[C_TEST_CONFIG]}"), STRDEF(""));
         strReplace(testC, STRDEF("{[C_TEST_PGB_PATH]}"), STRDEF("../../../../repo"));
         strReplace(testC, STRDEF("{[C_TEST_SCALE]}"), STRDEF("1"));
         strReplace(testC, STRDEF("{[C_TEST_TIMING]}"), STRDEF("true"));
@@ -292,8 +294,9 @@ testRun(void)
 
         TEST_RESULT_VOID(
             cmdTest(
-                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), STRDEF("none"), 3, STRDEF("invalid"),
-                STRDEF("common/stack-trace"), 0, 1, logLevelDebug, true, NULL, architecture, false, false, false, true),
+                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), NULL, STRDEF("none"), 3,
+                STRDEF("invalid"), STRDEF("common/stack-trace"), 0, 1, logLevelDebug, true, NULL, architecture, false,
+                false, false, true),
             "new build");
 
         // Older versions of ninja may error on a rebuild so a retry may occur
@@ -419,8 +422,9 @@ testRun(void)
 
         TEST_RESULT_VOID(
             cmdTest(
-                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), STRDEF("none"), 3, STRDEF("invalid"),
-                STRDEF("common/error"), 5, 1, logLevelDebug, true, NULL, architecture, false, false, false, true),
+                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), NULL, STRDEF("none"), 3,
+                STRDEF("invalid"), STRDEF("common/error"), 5, 1, logLevelDebug, true, NULL, architecture, false, false,
+                false, true),
             "new build");
 
         // Older versions of ninja may error on a rebuild so a retry may occur
@@ -617,8 +621,8 @@ testRun(void)
 
         TEST_RESULT_VOID(
             cmdTest(
-                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), STRDEF("uXX"), 3, STRDEF("invalid"),
-                STRDEF("test/shim"), 0, 1, logLevelDebug, true, NULL, architecture, true,
+                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), NULL, STRDEF("uXX"), 3,
+                STRDEF("invalid"), STRDEF("test/shim"), 0, 1, logLevelDebug, true, NULL, architecture, true,
 #ifdef DEBUG_COVERAGE
                 true,
 #else
@@ -780,8 +784,8 @@ testRun(void)
 
         TEST_RESULT_VOID(
             cmdTest(
-                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), STRDEF("uXX"), 3, STRDEF("invalid"),
-                STRDEF("test/shim"), 0, 1, logLevelDebug, true, NULL, architecture, true,
+                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), NULL, STRDEF("uXX"), 3,
+                STRDEF("invalid"), STRDEF("test/shim"), 0, 1, logLevelDebug, true, NULL, architecture, true,
 #ifdef DEBUG_COVERAGE
                 true,
 #else
@@ -809,8 +813,9 @@ testRun(void)
 
         TEST_RESULT_VOID(
             cmdTest(
-                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), STRDEF("uXX"), 3, STRDEF("invalid"),
-                STRDEF("real/all"), 0, 1, logLevelDebug, true, STRDEF("America/New_York"), architecture, false,
+                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), NULL, STRDEF("uXX"), 3,
+                STRDEF("invalid"), STRDEF("real/all"), 0, 1, logLevelDebug, true, STRDEF("America/New_York"),
+                architecture, false,
 #ifdef DEBUG_COVERAGE
                 true,
 #else
@@ -978,8 +983,9 @@ testRun(void)
 
         TEST_RESULT_VOID(
             cmdTest(
-                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), STRDEF("uXX"), 3, STRDEF("invalid"),
-                STRDEF("performance/type"), 0, 1, logLevelDebug, true, STRDEF("America/New_York"), architecture, false,
+                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), NULL, STRDEF("uXX"), 3,
+                STRDEF("invalid"), STRDEF("performance/type"), 0, 1, logLevelDebug, true, STRDEF("America/New_York"),
+                architecture, false,
 #ifdef DEBUG_COVERAGE
                 true,
 #else
@@ -1129,9 +1135,9 @@ testRun(void)
 
         TEST_RESULT_VOID(
             cmdTest(
-                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), STRDEF("uXX"), 3, STRDEF("invalid"),
-                STRDEF("performance/type"), 0, 1, logLevelDebug, true, STRDEF("America/New_York"), STRDEF(TEST_ARCHITECTURE), false,
-                false, false, false),
+                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), NULL, STRDEF("uXX"), 3,
+                STRDEF("invalid"), STRDEF("performance/type"), 0, 1, logLevelDebug, true, STRDEF("America/New_York"),
+                STRDEF(TEST_ARCHITECTURE), false, false, false, false),
             "new build");
 
         // Older versions of ninja may error on a rebuild so a retry may occur
@@ -1170,9 +1176,9 @@ testRun(void)
 
         TEST_ERROR(
             cmdTest(
-                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), STRDEF("uXX"), 3, STRDEF("invalid"),
-                STRDEF("performance/type"), 0, 1, logLevelDebug, true, STRDEF("America/New_York"), architecture, false, false,
-                false, false),
+                STRDEF(TEST_PATH "/repo"), storagePathP(storageTest, STRDEF("test")), NULL, STRDEF("uXX"), 3,
+                STRDEF("invalid"), STRDEF("performance/type"), 0, 1, logLevelDebug, true, STRDEF("America/New_York"),
+                architecture, false, false, false, false),
             FileOpenError,
             "build failed for unit performance/type: unable to open file '" TEST_PATH "/repo/meson.build' for read: [13] Permission"
             " denied");

@@ -48,6 +48,7 @@ sub new
         $self->{oStorageTest},
         $self->{strBackRestBase},
         $self->{strTestPath},
+        $self->{strTestConfig},
         $self->{oTest},
         $self->{bDryRun},
         $self->{bVmOut},
@@ -83,6 +84,7 @@ sub new
             {name => 'oStorageTest'},
             {name => 'strBackRestBase'},
             {name => 'strTestPath'},
+            {name => 'strTestConfig', required => false},
             {name => 'oTest'},
             {name => 'bDryRun'},
             {name => 'bVmOut'},
@@ -258,6 +260,7 @@ sub run
                 ($strVm ne VM_NONE ? "docker exec -i -u ${\TEST_USER} ${strImage} bash -l -c '\\\n" : '') .
                 $self->{strTestPath} . "/build/${strVm}/test/src/test-pgbackrest" .
                     ' --repo-path=' . $self->{strTestPath} . '/repo' . ' --test-path=' . $self->{strTestPath} .
+                    (defined($self->{strTestConfig}) ? " --test-config='$self->{strTestConfig}'" : '') .
                     " --log-level=$self->{strLogLevel}" . ' --vm=' . $self->{oTest}->{&TEST_VM} .
                     (defined($self->{strVmArch}) ? ' --vm-arch=' . $self->{strVmArch} : '') .
                     ' --vm-id=' . $self->{iVmIdx} . ($self->{bProfile} ? ' --profile' : '') . $strCommandRunParam .

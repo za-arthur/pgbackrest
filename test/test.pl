@@ -97,6 +97,7 @@ test.pl [options]
  Configuration Options:
    --psql-bin           path to the psql executables (e.g. /usr/lib/postgresql/16/bin/)
    --test-path          path where tests are executed (defaults to ./test)
+   --test-config        path to file appended to postgresql.conf for integration tests
    --log-level          log level to use for test harness (and Perl tests) (defaults to INFO)
    --log-level-test     log level to use for C tests (defaults to OFF)
    --log-level-test-file log level to use for file logging in integration tests (defaults to TRACE)
@@ -165,6 +166,7 @@ my $iScale = 1;
 my $bDebugTestTrace = false;
 my $iRetry = 0;
 my $strTimeZone = undef;
+my $strTestConfig = undef;
 
 my @cmdOptions = @ARGV;
 
@@ -193,6 +195,7 @@ GetOptions ('q|quiet' => \$bQuiet,
             'pg-version=s' => \$strPgVersion,
             'build-only' => \$bBuildOnly,
             'build-max=s' => \$iBuildMax,
+            'test-config=s' => \$strTestConfig,
             'coverage-only' => \$bCoverageOnly,
             'coverage-summary' => \$bCoverageSummary,
             'no-coverage' => \$bNoCoverage,
@@ -300,6 +303,12 @@ eval
     if (!defined($strTestPath))
     {
         $strTestPath = cwd() . '/test';
+    }
+
+    # Resolve and validate test config path
+    if (defined($strTestConfig))
+    {
+        $strTestConfig = abs_path($strTestConfig);
     }
 
     my $oStorageTest = new pgBackRestTest::Common::Storage(
@@ -778,8 +787,8 @@ eval
             if (!defined($$oyProcess[$iVmIdx]) && $iTestIdx < @{$oyTestRun})
             {
                 my $oJob = new pgBackRestTest::Common::JobTest(
-                    $oStorageTest, $strBackRestBase, $strTestPath, $$oyTestRun[$iTestIdx], $bDryRun, $bVmOut, $strPlatform,
-                    $strVmArch, $strImage, $iVmIdx, $iVmMax, $iTestIdx, $iTestMax, $strLogLevel, $strLogLevelTest,
+                    $oStorageTest, $strBackRestBase, $strTestPath, $strTestConfig, $$oyTestRun[$iTestIdx], $bDryRun, $bVmOut,
+                    $strPlatform, $strVmArch, $strImage, $iVmIdx, $iVmMax, $iTestIdx, $iTestMax, $strLogLevel, $strLogLevelTest,
                     $strLogLevelTestFile, !$bNoLogTimestamp, $bShowOutputAsync, $bNoCleanup, $iRetry, !$bNoBackTrace, !$bNoValgrind,
                     !$bNoCoverage, $bCoverageSummary, !$bNoOptimize, $bProfile, $iScale, $strTimeZone, !$bNoDebug, $bDebugTestTrace,
                     $iBuildMax / $iVmMax < 1 ? 1 : int($iBuildMax / $iVmMax));
@@ -811,7 +820,9 @@ eval
 
         my $oExec = new pgBackRestTest::Common::ExecuteTest(
             "${strBuildPath}/test/src/test-pgbackrest --log-level=warn --vm=${strVm} --repo-path=${strBackRestBase}" .
-            " --test-path=${strTestPath}" . ($bCoverageSummary ? ' --coverage-summary' : '') . " test${strModuleList}",
+            " --test-path=${strTestPath}" .
+            (defined($strTestConfig) ? " --test-config='${strTestConfig}'" : '') .
+            ($bCoverageSummary ? ' --coverage-summary' : '') . " test${strModuleList}",
             {bShowOutputAsync => true, bSuppressError => true});
         $oExec->begin();
         my $iResult = $oExec->end();

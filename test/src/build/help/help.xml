@@ -192,6 +192,16 @@
                     <example>n</example>
                 </option>
 
+                <option id="test-config">
+                    <summary>Append PostgreSQL config for integration tests.</summary>
+
+                    <text>
+                        <p>File containing PostgreSQL settings to append to generated <file>postgresql.conf</file> in integration tests.</p>
+                    </text>
+
+                    <example>/path/to/test-config.conf</example>
+                </option>
+
                 <option id="tz">
                     <summary>Timezone for testing.</summary>
 

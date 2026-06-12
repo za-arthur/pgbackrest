@@ -358,6 +358,13 @@ hrnHostPgConf(HrnHost *const this)
             strCatZ(config, "max_parallel_workers_per_gather = 2\n");
         }
 
+        // Append test-specific PostgreSQL configuration
+        if (testConfig()[0] != '\0')
+        {
+            const Storage *const storageRoot = storagePosixNewP(FSLASH_STR);
+            strCat(config, strNewBuf(storageGetP(storageNewReadP(storageRoot, STR(testConfig())))));
+        }
+
         // Write postgresql.conf
         storagePutP(
             storageNewWriteP(

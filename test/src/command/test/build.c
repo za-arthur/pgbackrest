@@ -29,14 +29,16 @@ Constants
 /**********************************************************************************************************************************/
 TestBuild *
 testBldNew(
-    const String *const pathRepo, const String *const pathTest, const String *const vm, const String *const vmInt,
-    const unsigned int vmId, const String *const pgVersion, const TestDefModule *const module, const unsigned int test,
-    const uint64_t scale, const LogLevel logLevel, const bool logTime, const String *const timeZone,
-    const String *const architecture, const bool coverage, const bool profile, const bool optimize, const bool backTrace)
+    const String *const pathRepo, const String *const pathTest, const String *const testConfig, const String *const vm,
+    const String *const vmInt, const unsigned int vmId, const String *const pgVersion,
+    const TestDefModule *const module, const unsigned int test, const uint64_t scale, const LogLevel logLevel,
+    const bool logTime, const String *const timeZone, const String *const architecture, const bool coverage,
+    const bool profile, const bool optimize, const bool backTrace)
 {
     FUNCTION_LOG_BEGIN(logLevelDebug);
         FUNCTION_LOG_PARAM(STRING, pathRepo);
         FUNCTION_LOG_PARAM(STRING, pathTest);
+        FUNCTION_LOG_PARAM(STRING, testConfig);
         FUNCTION_LOG_PARAM(STRING, vm);
         FUNCTION_LOG_PARAM(STRING, vmInt);
         FUNCTION_LOG_PARAM(UINT, vmId);
@@ -69,6 +71,7 @@ testBldNew(
             {
                 .pathRepo = strDup(pathRepo),
                 .pathTest = strDup(pathTest),
+                .testConfig = strDup(testConfig),
                 .vm = strDup(vm),
                 .vmInt = strDup(vmInt),
                 .vmId = vmId,
@@ -644,6 +647,11 @@ testBldUnit(TestBuild *const this)
 
         // Test path
         strReplace(testC, STRDEF("{[C_TEST_PATH]}"), storagePathP(storageTestId, NULL));
+
+        // Additional postgresql.conf for integration testing
+        const String *const testConfig = testBldTestConfig(this);
+        strReplace(
+            testC, STRDEF("{[C_TEST_CONFIG]}"), testConfig == NULL ? STRDEF("") : testConfig);
 
         // Harness data path
         const String *const pathHarnessData = strNewFmt("%s/data-%u", strZ(testBldPathTest(this)), testBldVmId(this));

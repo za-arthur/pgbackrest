@@ -19,9 +19,9 @@ typedef struct TestBuild TestBuild;
 Constructors
 ***********************************************************************************************************************************/
 TestBuild *testBldNew(
-    const String *pathRepo, const String *pathTest, const String *const vm, const String *const vmInt, unsigned int vmId,
-    const String *pgVersion, const TestDefModule *module, unsigned int test, uint64_t scale, LogLevel logLevel, bool logTime,
-    const String *timeZone, const String *architecture, bool coverage, bool profile, bool optimize, bool backTrace);
+    const String *pathRepo, const String *pathTest, const String *testConfig, const String *const vm, const String *const vmInt,
+    unsigned int vmId, const String *pgVersion, const TestDefModule *module, unsigned int test, uint64_t scale, LogLevel logLevel,
+    bool logTime, const String *timeZone, const String *architecture, bool coverage, bool profile, bool optimize, bool backTrace);
 
 /***********************************************************************************************************************************
 Getters/Setters
@@ -30,6 +30,7 @@ typedef struct TestBuildPub
 {
     const String *pathRepo;                                         // Code repository path
     const String *pathTest;                                         // Test path
+    const String *testConfig;                                       // Config file appended to generated postgresql.conf
     const Storage *storageRepo;                                     // Repository storage
     const Storage *storageTest;                                     // Test storage
     const String *vm;                                               // Vm to run the test on
@@ -62,6 +63,13 @@ FN_INLINE_ALWAYS const String *
 testBldPathTest(const TestBuild *const this)
 {
     return THIS_PUB(TestBuild)->pathTest;
+}
+
+// Test config
+FN_INLINE_ALWAYS const String *
+testBldTestConfig(const TestBuild *const this)
+{
+    return THIS_PUB(TestBuild)->testConfig;
 }
 
 // Repository storage

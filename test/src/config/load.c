@@ -72,6 +72,18 @@ cfgLoadUpdateOption(void)
         }
     }
 
+    // If test-config is relative then make it absolute
+    if (cfgOptionTest(cfgOptTestConfig))
+    {
+        const String *const testConfig = cfgOptionStr(cfgOptTestConfig);
+
+        if (!strBeginsWithZ(testConfig, "/"))
+        {
+            cfgOptionSet(
+                cfgOptTestConfig, cfgOptionSource(cfgOptTestConfig), VARSTR(strNewFmt("%s/%s", currentWorkDir, strZ(testConfig))));
+        }
+    }
+
     FUNCTION_LOG_RETURN_VOID();
 }
 

@@ -69,14 +69,16 @@ cmdTestVmArchFix(const String *vmArch)
 /**********************************************************************************************************************************/
 void
 cmdTest(
-    const String *const pathRepo, const String *const pathTest, const String *vm, const unsigned int vmId,
-    const String *const pgVersion, const String *moduleName, const unsigned int test, const uint64_t scale, const LogLevel logLevel,
-    const bool logTime, const String *const timeZone, const String *architecture, const bool coverage, const bool profile,
-    const bool optimize, const bool backTrace)
+    const String *const pathRepo, const String *const pathTest, const String *const testConfig,
+    const String *vm, const unsigned int vmId, const String *const pgVersion, const String *moduleName,
+    const unsigned int test, const uint64_t scale, const LogLevel logLevel, const bool logTime,
+    const String *const timeZone, const String *architecture, const bool coverage, const bool profile, const bool optimize,
+    const bool backTrace)
 {
     FUNCTION_LOG_BEGIN(logLevelDebug);
         FUNCTION_LOG_PARAM(STRING, pathRepo);
         FUNCTION_LOG_PARAM(STRING, pathTest);
+        FUNCTION_LOG_PARAM(STRING, testConfig);
         FUNCTION_LOG_PARAM(STRING, vm);
         FUNCTION_LOG_PARAM(UINT, vmId);
         FUNCTION_LOG_PARAM(STRING, pgVersion);
@@ -129,8 +131,8 @@ cmdTest(
             {
                 // Build unit
                 TestBuild *const testBld = testBldNew(
-                    pathRepo, pathTest, vm, vmInt, vmId, pgVersion, module, test, scale, logLevel, logTime, timeZone, architecture,
-                    coverage, profile, optimize, backTrace);
+                    pathRepo, pathTest, testConfig, vm, vmInt, vmId, pgVersion, module, test, scale, logLevel, logTime,
+                    timeZone, architecture, coverage, profile, optimize, backTrace);
                 testBldUnit(testBld);
 
                 // Meson setup

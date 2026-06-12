@@ -68,8 +68,9 @@ main(int argListSize, const char *argList[])
                 if (cfgOptionTest(cfgOptVmId))
                 {
                     cmdTest(
-                        cfgOptionStr(cfgOptRepoPath), cfgOptionStr(cfgOptTestPath), cfgOptionStr(cfgOptVm),
-                        cfgOptionUInt(cfgOptVmId), cfgOptionStr(cfgOptPgVersion), strLstGet(cfgCommandParam(), 0),
+                        cfgOptionStr(cfgOptRepoPath), cfgOptionStr(cfgOptTestPath), cfgOptionStrNull(cfgOptTestConfig),
+                        cfgOptionStr(cfgOptVm), cfgOptionUInt(cfgOptVmId),
+                        cfgOptionStr(cfgOptPgVersion), strLstGet(cfgCommandParam(), 0),
                         cfgOptionTest(cfgOptTest) ? cfgOptionUInt(cfgOptTest) : 0, cfgOptionUInt64(cfgOptScale),
                         logLevelEnum(cfgOptionSeq(cfgOptLogLevelTest)), cfgOptionBool(cfgOptLogTimestamp),
                         cfgOptionStrNull(cfgOptTz), cfgOptionStrNull(cfgOptVmArch), cfgOptionBool(cfgOptCoverage),

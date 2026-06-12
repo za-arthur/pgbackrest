@@ -136,6 +136,12 @@ option:
     command:
       test: {}
 
+  test-config:
+    type: string
+    required: false
+    command:
+      test: {}
+
   tz:
     type: string
     internal: true

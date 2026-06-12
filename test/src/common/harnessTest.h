@@ -70,6 +70,9 @@ bool testContainer(void);
 // parallel.
 unsigned int testIdx(void);
 
+// Additional postgresql.conf for integration testing
+const char *testConfig(void);
+
 // PostgreSQL version for integration testing
 const char *testPgVersion(void);
 

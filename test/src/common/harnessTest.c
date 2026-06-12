@@ -39,6 +39,7 @@ static unsigned int testIdxData = 0;
 static bool testTiming = true;
 static const char *testArchitectureData = NULL;
 static const char *testPathData = NULL;
+static const char *testConfigData = NULL;
 static const char *testUserData = NULL;
 static const char *testVmData = NULL;
 static const char *testPgVersionData = NULL;
@@ -66,8 +67,8 @@ void
 hrnInit(
     const char *const testExe, const char *const testProjectExe, const bool testContainer, const bool testLogExpect,
     const unsigned int testIdx, const bool timing, const char *const architecture, const char *const testPath,
-    const char *const testUser, const char *const testVm, const char *const testPgVersion,const char *const testDataPath,
-    const char *const testRepoPath)
+    const char *const testConfig, const char *const testUser, const char *const testVm, const char *const testPgVersion,
+    const char *const testDataPath, const char *const testRepoPath)
 {
     FUNCTION_HARNESS_VOID();
 
@@ -81,6 +82,7 @@ hrnInit(
     testTiming = timing;
     testArchitectureData = architecture;
     testPathData = testPath;
+    testConfigData = testConfig;
     testUserData = testUser;
     testVmData = testVm;
     testPgVersionData = testPgVersion;
@@ -717,6 +719,14 @@ testPath(void)
 {
     FUNCTION_HARNESS_VOID();
     FUNCTION_HARNESS_RETURN(STRINGZ, testPathData);
+}
+
+/**********************************************************************************************************************************/
+const char *
+testConfig(void)
+{
+    FUNCTION_HARNESS_VOID();
+    FUNCTION_HARNESS_RETURN(STRINGZ, testConfigData);
 }
 
 /**********************************************************************************************************************************/
