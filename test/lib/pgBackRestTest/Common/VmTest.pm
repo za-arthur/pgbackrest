@@ -37,6 +37,8 @@ use constant VM_OS_BASE                                             => 'os-base'
 use constant VMDEF_PG_REPO                                          => 'pg-repo';
 use constant VMDEF_PGSQL_BIN                                        => 'psql-bin';
     push @EXPORT, qw(VMDEF_PGSQL_BIN);
+use constant VM_PG_PROVIDER                                         => 'pg-provider';
+    push @EXPORT, qw(VM_PG_PROVIDER);
 
 ####################################################################################################################################
 # Valid OS base List
@@ -77,6 +79,14 @@ use constant VM_F44                                                 => 'f44';
     push @EXPORT, qw(VM_F44);
 use constant VM_U22                                                 => 'u22';
     push @EXPORT, qw(VM_U22);
+
+####################################################################################################################################
+# Valid PG provider list
+####################################################################################################################################
+use constant VM_PG_PROVIDER_PGDG                                    => 'Pgdg';
+    push @EXPORT, qw(VM_PG_PROVIDER_PGDG);
+use constant VM_PG_PROVIDER_SCRIPT                                  => 'Script';
+    push @EXPORT, qw(VM_PG_PROVIDER_SCRIPT);
 
 # List of default test VMs
 use constant VM_LIST                                                => (VM_D12, VM_RH8, VM_U22);

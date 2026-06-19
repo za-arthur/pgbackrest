@@ -329,6 +329,20 @@ sub entryPointSetup
 }
 
 ####################################################################################################################################
+# pgProviderNew - factory that loads and initializes a named PG provider
+####################################################################################################################################
+sub pgProviderNew
+{
+    my $strProvider = shift;
+    my $hCfg = shift;
+
+    my $strFile = "pgBackRestTest/Common/PgProvider/${strProvider}.pm";
+    require $strFile;
+
+    return "pgBackRestTest::Common::PgProvider::${strProvider}"->new($hCfg);
+}
+
+####################################################################################################################################
 # Build containers
 ####################################################################################################################################
 sub containerBuild
@@ -337,6 +351,7 @@ sub containerBuild
     my $strVm = shift;
     my $strArch = shift;
     my $bVmForce = shift;
+    my $strPgProviderConfig = shift;
 
     # Create temp path
     my $strTempPath = $oStorageDocker->pathGet('test/result/docker');
@@ -347,6 +362,13 @@ sub containerBuild
     YAML::XS->import(qw(Load));
 
     $hContainerCache = Load(${$oStorageDocker->get($oStorageDocker->pathGet('test/container.yaml'))});
+
+    # Load external PostgreSQL provider config if specified
+    my $hExternalProviderConfig = undef;
+    if (defined($strPgProviderConfig))
+    {
+        $hExternalProviderConfig = Load(${$oStorageDocker->get($strPgProviderConfig)});
+    }
 
     # Remove old images on force
     if ($bVmForce)
@@ -453,101 +475,17 @@ sub containerBuild
         #---------------------------------------------------------------------------------------------------------------------------
         if (!$bDeprecated)
         {
-            if ($$oVm{$strOS}{&VM_OS_BASE} eq VM_OS_BASE_RHEL || $$oVm{$strOS}{&VM_OS_BASE} eq VM_OS_BASE_DEBIAN)
-            {
-                $strScript .= sectionHeader() .
-                    "# Install PostgreSQL packages\n";
-            }
+            my $strProviderName = defined($hExternalProviderConfig) ?
+                $hExternalProviderConfig->{provider} : ($oOS->{&VM_PG_PROVIDER} // VM_PG_PROVIDER_PGDG);
+            my $hProviderCfg = defined($hExternalProviderConfig) ?
+                ($hExternalProviderConfig->{config} // {}) : {};
+            my $oProvider = pgProviderNew($strProviderName, $hProviderCfg);
 
-            if ($$oVm{$strOS}{&VM_OS_BASE} eq VM_OS_BASE_RHEL)
-            {
-                $strScript .=
-                    "    rpm --import https://download.postgresql.org/pub/repos/yum/keys/RPM-GPG-KEY-PGDG && \\\n";
+            my $strRepoSetup = $oProvider->repoSetup($strOS, $strArch);
+            $strScript .= sectionHeader() . $strRepoSetup if $strRepoSetup ne '';
 
-                if ($strOS eq VM_RH8)
-                {
-                    $strScript .=
-                        "    rpm -ivh \\\n" .
-                        "        https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-" . hostArch() . "/" .
-                            "pgdg-redhat-repo-latest.noarch.rpm && \\\n" .
-                        "    dnf -qy module disable postgresql && \\\n";
-                }
-                elsif ($strOS eq VM_F44)
-                {
-                    $strScript .=
-                        "    rpm -ivh \\\n" .
-                        "        https://download.postgresql.org/pub/repos/yum/reporpms/F-44-" . hostArch() . "/" .
-                            "pgdg-fedora-repo-latest.noarch.rpm && \\\n" .
-                        "    yum -y install libcurl-devel && \\\n"
-                }
-
-                $strScript .= "    yum -y install postgresql-devel";
-            }
-            elsif ($$oVm{$strOS}{&VM_OS_BASE} eq VM_OS_BASE_DEBIAN)
-            {
-                # Install repo from apt.postgresql.org
-                if (vmPgRepo($strVm))
-                {
-                    $strScript .=
-                        "    apt-get install -y --no-install-recommends postgresql-common && \\\n" .
-                        "    /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y && \\\n";
-                }
-
-                $strScript .=
-                    "    apt-get install -y --no-install-recommends postgresql-common libpq-dev && \\\n" .
-                    "    sed -i 's/^\\#create\\_main\\_cluster.*\$/create\\_main\\_cluster \\= false/' " .
-                        "/etc/postgresql-common/createcluster.conf";
-            }
-
-            if (defined($oOS->{&VM_DB}) && @{$oOS->{&VM_DB}} > 0 &&
-                ($strArch eq VM_ARCH_AARCH64 || $strArch eq VM_ARCH_X86_64 || $strArch eq VM_ARCH_I386))
-            {
-                $strScript .= sectionHeader() .
-                    "# Install PostgreSQL\n";
-
-                if ($$oVm{$strOS}{&VM_OS_BASE} eq VM_OS_BASE_RHEL)
-                {
-                    $strScript .= "    yum -y install";
-                }
-                elsif ($$oVm{$strOS}{&VM_OS_BASE} eq VM_OS_BASE_DEBIAN)
-                {
-                    $strScript .= "    apt-get install -y --no-install-recommends";
-                }
-                elsif ($$oVm{$strOS}{&VM_OS_BASE} eq VM_OS_BASE_ALPINE)
-                {
-                    $strScript .= "    apk add --no-cache";
-                }
-
-                # Construct list of databases to install
-                foreach my $strDbVersion (@{$oOS->{&VM_DB}})
-                {
-                    if ($$oVm{$strOS}{&VM_OS_BASE} eq VM_OS_BASE_RHEL)
-                    {
-                        my $strDbVersionNoDot = $strDbVersion;
-                        $strDbVersionNoDot =~ s/\.//;
-
-                        $strScript .= " postgresql${strDbVersionNoDot}-server";
-
-                        # Add development package for the latest version of postgres
-                        if ($strDbVersion eq @{$oOS->{&VM_DB}}[-1])
-                        {
-                            $strScript .= " postgresql${strDbVersionNoDot}-devel";
-                        }
-                    }
-                    elsif ($$oVm{$strOS}{&VM_OS_BASE} eq VM_OS_BASE_DEBIAN)
-                    {
-                        # Disable PostgreSQL 18 on architectures that do not support it yet
-                        next if ($strDbVersion eq '18' &&
-                            !($strOS eq VM_U22 && ($strArch eq VM_ARCH_AARCH64 || $strArch eq VM_ARCH_X86_64)));
-
-                        $strScript .= " postgresql-${strDbVersion}";
-                    }
-                    elsif ($$oVm{$strOS}{&VM_OS_BASE} eq VM_OS_BASE_ALPINE)
-                    {
-                        $strScript .= " postgresql${strDbVersion}";
-                    }
-                }
-            }
+            my $strInstallPg = $oProvider->installPg($strOS, $strArch, $oOS->{&VM_DB});
+            $strScript .= sectionHeader() . $strInstallPg if $strInstallPg ne '';
         }
 
         # Add path to latest version of postgres

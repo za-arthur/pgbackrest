@@ -111,6 +111,7 @@ test.pl [options]
    --vm-force           force a rebuild of Docker containers
    --vm-out             Show VM output (default false)
    --vm-max             max VMs to run in parallel (default 1)
+   --pg-provider-config path to YAML file for a custom PostgreSQL provider
 
  General Options:
    --version            display version and exit
@@ -145,6 +146,7 @@ my $strVm = VM_NONE;
 my $strVmArch;
 my $bVmBuild = false;
 my $bVmForce = false;
+my $strPgProviderConfig = undef;
 my $bBuildOnly = false;
 my $iBuildMax = 4;
 my $bCoverageOnly = false;
@@ -186,6 +188,7 @@ GetOptions ('q|quiet' => \$bQuiet,
             'vm-out' => \$bVmOut,
             'vm-build' => \$bVmBuild,
             'vm-force' => \$bVmForce,
+            'pg-provider-config=s' => \$strPgProviderConfig,
             'module=s@' => \@stryModule,
             'test=s@' => \@stryModuleTest,
             'run=s@' => \@iyModuleTestRun,
@@ -311,6 +314,11 @@ eval
         $strTestConfig = abs_path($strTestConfig);
     }
 
+    if (defined($strPgProviderConfig))
+    {
+        $strPgProviderConfig = abs_path($strPgProviderConfig);
+    }
+
     my $oStorageTest = new pgBackRestTest::Common::Storage(
         $strTestPath, new pgBackRestTest::Common::StoragePosix({bFileSync => false, bPathSync => false}));
 
@@ -370,7 +378,7 @@ eval
     ################################################################################################################################
     if ($bVmBuild)
     {
-        containerBuild($oStorageBackRest, $strVm, $strVmArch, $bVmForce);
+        containerBuild($oStorageBackRest, $strVm, $strVmArch, $bVmForce, $strPgProviderConfig);
         exit 0;
     }
 
